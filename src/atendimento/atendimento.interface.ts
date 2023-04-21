@@ -1,6 +1,6 @@
 import { ItensServicoSchema } from './../itens-servico/itens-servico.interface';
 import { z } from 'zod';
-import { zodToSwagger } from 'src/utils/zodToSwagger';
+
 
 
 export const AtendimentoSchema = z.object({
@@ -22,4 +22,3 @@ export class AtendimentoDto {
 
 }
 
-zodToSwagger(AtendimentoSchema)
