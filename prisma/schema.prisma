@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Definicao do modelo Cliente
+model Cliente {
+  id           String        @id @default(uuid())
+  login        String        @unique
+  hashSenha    String
+  salSenha     String
+  atendimentos Atendimento[]
+  @@map("cliente")
+}
+
+// Definicao do modelo Clinica
+model Clinica {
+  id           String        @id @default(uuid())
+  nome         String
+  servicos     Servico[]
+  Atendimentos Atendimento[]
+  @@map("clinica")
+}
+
+// Definicao do modelo Servico
+model Servico {
+  id             String           @id @default(uuid())
+  nome           String
+  valor          Float
+  tempo          Int
+  clinica        Clinica          @relation(fields: [clinicaId], references: [id], onDelete: NoAction)
+  clinicaId      String
+  itensDeServico ItensDeServico[]
+  @@map("servico")
+}
+
+// Definicao do modelo Profissional
+model Profissional {
+  id             String           @id @default(uuid())
+  nome           String
+  itensDeServico ItensDeServico[]
+  @@map("profissional")
+}
+
+// Definicao do modelo Atendimento
+model Atendimento {
+  id             String           @id @default(uuid())
+  cliente        Cliente          @relation(fields: [clienteId], references: [id], onDelete: NoAction)
+  clienteId      String
+  clinica        Clinica          @relation(fields: [clinicaId], references: [id], onDelete: NoAction)
+  clinicaId      String
+  inicio         DateTime         @default(now())
+  fim            DateTime?
+  itensDeServico ItensDeServico[]
+  concluido      Boolean          @default(false)
+  @@map("atendimento")
+}
+
+// Definicao do modelo ItemDeServico
+model ItensDeServico {
+  id             String       @id @default(uuid())
+  atendimento    Atendimento  @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  atendimentoId  String
+  servico        Servico      @relation(fields: [servicoId], references: [id], onDelete: NoAction)
+  servicoId      String
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: NoAction)
+  profissionalId String
+  valor          Float
+  comissao       Float        @default(0.1)
+  @@map("itens-servico")
+}
